@@ -1,0 +1,12 @@
+{
+  "version": "1.6.0-beta",
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "declaration": false,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "noLib": false,
+    "emitDecoratorMetadata": false
+  }
+}
