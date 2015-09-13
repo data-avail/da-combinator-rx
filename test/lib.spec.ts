@@ -13,7 +13,7 @@ var onNext = Rx.ReactiveTest.onNext,
 	
 describe("tests for combine",  () => {
 
-	it("simplest case, f-s, should issue result immediately after s arrival",  (done) => {
+	it("simplest case, p-s, should issue result immediately after s arrival",  () => {
 							
 		//[f1]--------
 		//------[s1]--
@@ -45,7 +45,6 @@ describe("tests for combine",  () => {
 			[onNext(600, {primary : "f1", secondary: "s1"})]
 		);
 		
-		done();
 	})	
 	
 	it("p-p-s, should issue 2 results immediately after s arrival",  (done) => {

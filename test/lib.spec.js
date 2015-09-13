@@ -5,7 +5,7 @@ var Rx = require('rx/index');
 var expect = chai.expect;
 var onNext = Rx.ReactiveTest.onNext, onCompleted = Rx.ReactiveTest.onCompleted, subscribe = Rx.ReactiveTest.subscribe;
 describe("tests for combine", function () {
-    it("simplest case, f-s, should issue result immediately after s arrival", function (done) {
+    it("simplest case, p-s, should issue result immediately after s arrival", function () {
         //[f1]--------
         //------[s1]--
         //============
@@ -19,7 +19,6 @@ describe("tests for combine", function () {
                 .combine(fs, ss, Rx.Observable.never(), Rx.Observable.never());
         });
         expect(res.messages).eqls([onNext(600, { primary: "f1", secondary: "s1" })]);
-        done();
     });
     it("p-p-s, should issue 2 results immediately after s arrival", function (done) {
         //[f1]--[f2]-----------
