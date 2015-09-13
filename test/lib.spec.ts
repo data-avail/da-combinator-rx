@@ -13,7 +13,7 @@ var onNext = Rx.ReactiveTest.onNext,
 	
 describe("tests for combine",  () => {
 
-	it("simplest case, s-p, should issue result immediately after p arrival",  (done) => {
+	it("simplest case, f-s, should issue result immediately after s arrival",  (done) => {
 							
 		//[f1]--------
 		//------[s1]--
@@ -26,13 +26,13 @@ describe("tests for combine",  () => {
 								
 		var fs = scheduler.createHotObservable(
 			onNext(300, "f1"), 
-			onCompleted(500)
+			onCompleted(700)
 		);
 		
 					
 		var ss = scheduler.createHotObservable(
-			onNext(400, "s1"), 
-			onCompleted(500)
+			onNext(600, "s1"), 
+			onCompleted(700)
 		);
 		
 							
@@ -42,13 +42,13 @@ describe("tests for combine",  () => {
 		);
 							
 		expect(res.messages).eqls(
-			[onNext(400, {primary : "f1", secondary: "s1"})]
+			[onNext(600, {primary : "f1", secondary: "s1"})]
 		);
 		
 		done();
 	})	
 	
-	it.only("p-p-s, should issue 2 results immediately after s arrival",  (done) => {
+	it("p-p-s, should issue 2 results immediately after s arrival",  (done) => {
 		//[f1]--[f2]-----------
 		//------------[s1]-----
 		//=====================
@@ -82,8 +82,77 @@ describe("tests for combine",  () => {
 			]
 		);
 		
-		done();
+		done();		
+	})
+	
+	it("s-p, should issue result as soon as f arrive",  (done) => {
+		//------------[f1]--
+		//[s1]-------------
+		//=====================
+		//------------[f1]-
+		//------------[s1]-
+
+		var scheduler = new Rx.TestScheduler();
+								
+		var fs = scheduler.createHotObservable(
+			onNext(500, "f1"), 
+			onCompleted(700)
+		);
 		
+					
+		var ss = scheduler.createHotObservable(			 
+			onNext(300, "s1"),
+			onCompleted(700)
+		);
+		
+											
+		var res = scheduler.startWithCreate(() =>  
+			lib.combinator
+				.combine(fs, ss, Rx.Observable.never(), Rx.Observable.never())				
+		);
+		
+		expect(res.messages).eqls([
+				onNext(500, {primary : "f1", secondary: "s1"})
+			]);
+			
+					
+		
+		done();		
 	})	
+
+	it("s-s-p, should issue result with latest s as soon as f arrive",  (done) => {
+		//------------[f1]--
+		//[s1]---[s2]-------
+		//=====================
+		//------------[f1]-
+		//------------[s2]-
+
+		var scheduler = new Rx.TestScheduler();
+								
+		var fs = scheduler.createHotObservable(
+			onNext(500, "f1"), 
+			onCompleted(700)
+		);
+		
+					
+		var ss = scheduler.createHotObservable(			 
+			onNext(300, "s1"),
+			onNext(400, "s2"),
+			onCompleted(700)
+		);
+		
+											
+		var res = scheduler.startWithCreate(() =>  
+			lib.combinator
+				.combine(fs, ss, Rx.Observable.never(), Rx.Observable.never())				
+		);
+		
+		expect(res.messages).eqls([
+				onNext(500, {primary : "f1", secondary: "s2"})
+			]);
+										
+		done();		
+	})	
+	
 }) 
 

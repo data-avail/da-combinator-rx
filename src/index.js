@@ -1,3 +1,5 @@
+///<reference path="../typings/tsd.d.ts"/>
+var Rx = require("rx");
 var combinator;
 (function (combinator) {
     var ItemType;
@@ -11,18 +13,19 @@ var combinator;
     function combine(primaryStream, secondaryStream, primaryStreamClose, secondaryStreamClose) {
         var primes = primaryStream
             .map(function (m) { return tulpe(ItemType.first, m); })
-            .merge(primaryStreamClose.map(function (m) { return tulpe(ItemType.close, m); }));
+            .merge(primaryStreamClose.startWith(null).map(function (m) { return tulpe(ItemType.close, m); }));
         var seconds = secondaryStream
             .map(function (m) { return tulpe(ItemType.second, m); })
-            .merge(secondaryStreamClose.map(function (m) { return tulpe(ItemType.close, m); }))
-            .shareReplay(null, 1);
+            .merge(secondaryStreamClose.startWith(null).map(function (m) { return tulpe(ItemType.close, m); }));
         var combines = primes.combineLatest(seconds, function (v1, v2) { return [v1, v2]; });
         var closings = combines.filter(function (v) {
             return (v[0].type == ItemType.first && v[1].type == ItemType.second) ||
                 (v[0].type == ItemType.close && v[1].type == ItemType.close);
-        })
+        });
+        var windows = combines.buffer(closings)
+            .map(function (v) { return v.map(function (m) { return [m[0], v[v.length - 1][1]]; }); })
+            .selectMany(function (v) { return Rx.Observable.fromArray(v); })
             .distinctUntilChanged(function (v) { return v[0].item; });
-        var windows = primes.join(seconds, function (_) { return closings; }, function (_) { return closings; }, function (v1, v2) { return [v1, v2]; });
         var results = windows.filter(function (v) { return v[0].type != ItemType.close && v[1].type != ItemType.close; });
         return results.map(function (val) {
             return { primary: val[0].item, secondary: val[1].item };

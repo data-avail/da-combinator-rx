@@ -5,23 +5,23 @@ var Rx = require('rx/index');
 var expect = chai.expect;
 var onNext = Rx.ReactiveTest.onNext, onCompleted = Rx.ReactiveTest.onCompleted, subscribe = Rx.ReactiveTest.subscribe;
 describe("tests for combine", function () {
-    it("simplest case, s-p, should issue result immediately after p arrival", function (done) {
+    it("simplest case, f-s, should issue result immediately after s arrival", function (done) {
         //[f1]--------
         //------[s1]--
         //============
         //------[f1]--
         //------[s1]--
         var scheduler = new Rx.TestScheduler();
-        var fs = scheduler.createHotObservable(onNext(300, "f1"), onCompleted(500));
-        var ss = scheduler.createHotObservable(onNext(400, "s1"), onCompleted(500));
+        var fs = scheduler.createHotObservable(onNext(300, "f1"), onCompleted(700));
+        var ss = scheduler.createHotObservable(onNext(600, "s1"), onCompleted(700));
         var res = scheduler.startWithCreate(function () {
             return lib.combinator
                 .combine(fs, ss, Rx.Observable.never(), Rx.Observable.never());
         });
-        expect(res.messages).eqls([onNext(400, { primary: "f1", secondary: "s1" })]);
+        expect(res.messages).eqls([onNext(600, { primary: "f1", secondary: "s1" })]);
         done();
     });
-    it.only("p-p-s, should issue 2 results immediately after s arrival", function (done) {
+    it("p-p-s, should issue 2 results immediately after s arrival", function (done) {
         //[f1]--[f2]-----------
         //------------[s1]-----
         //=====================
@@ -37,6 +37,42 @@ describe("tests for combine", function () {
         expect(res.messages).eqls([
             onNext(500, { primary: "f1", secondary: "s1" }),
             onNext(500, { primary: "f2", secondary: "s1" }),
+        ]);
+        done();
+    });
+    it("s-p, should issue result as soon as f arrive", function (done) {
+        //------------[f1]--
+        //[s1]-------------
+        //=====================
+        //------------[f1]-
+        //------------[s1]-
+        var scheduler = new Rx.TestScheduler();
+        var fs = scheduler.createHotObservable(onNext(500, "f1"), onCompleted(700));
+        var ss = scheduler.createHotObservable(onNext(300, "s1"), onCompleted(700));
+        var res = scheduler.startWithCreate(function () {
+            return lib.combinator
+                .combine(fs, ss, Rx.Observable.never(), Rx.Observable.never());
+        });
+        expect(res.messages).eqls([
+            onNext(500, { primary: "f1", secondary: "s1" })
+        ]);
+        done();
+    });
+    it("s-s-p, should issue result with latest s as soon as f arrive", function (done) {
+        //------------[f1]--
+        //[s1]---[s2]-------
+        //=====================
+        //------------[f1]-
+        //------------[s2]-
+        var scheduler = new Rx.TestScheduler();
+        var fs = scheduler.createHotObservable(onNext(500, "f1"), onCompleted(700));
+        var ss = scheduler.createHotObservable(onNext(300, "s1"), onNext(400, "s2"), onCompleted(700));
+        var res = scheduler.startWithCreate(function () {
+            return lib.combinator
+                .combine(fs, ss, Rx.Observable.never(), Rx.Observable.never());
+        });
+        expect(res.messages).eqls([
+            onNext(500, { primary: "f1", secondary: "s2" })
         ]);
         done();
     });
