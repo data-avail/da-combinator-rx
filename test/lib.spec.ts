@@ -38,7 +38,7 @@ describe("tests for combine | no cancel", () => {
 
 		var res = scheduler.startWithCreate(() =>
 			lib.combinator
-				.combine(fs, ss, Rx.Observable.never(), Rx.Observable.never())
+				.combine(fs, ss)
 			);
 
 		expect(res.messages).eqls(
@@ -71,7 +71,7 @@ describe("tests for combine | no cancel", () => {
 
 		var res = scheduler.startWithCreate(() =>
 			lib.combinator
-				.combine(fs, ss, Rx.Observable.never(), Rx.Observable.never())
+				.combine(fs, ss)
 			);
 
 		expect(res.messages).eqls(
@@ -106,7 +106,7 @@ describe("tests for combine | no cancel", () => {
 
 		var res = scheduler.startWithCreate(() =>
 			lib.combinator
-				.combine(fs, ss, Rx.Observable.never(), Rx.Observable.never())
+				.combine(fs, ss)
 			);
 
 		expect(res.messages).eqls([
@@ -139,7 +139,7 @@ describe("tests for combine | no cancel", () => {
 
 		var res = scheduler.startWithCreate(() =>
 			lib.combinator
-				.combine(fs, ss, Rx.Observable.never(), Rx.Observable.never())
+				.combine(fs, ss)
 			);
 
 		expect(res.messages).eqls([
@@ -172,7 +172,7 @@ describe("tests for combine | no cancel", () => {
 
 		var res = scheduler.startWithCreate(() =>
 			lib.combinator
-				.combine(fs, ss, Rx.Observable.never(), Rx.Observable.never())
+				.combine(fs, ss)
 			);
 
 		expect(res.messages).eqls([
@@ -209,7 +209,7 @@ describe("tests for combine | no cancel", () => {
 
 		var res = scheduler.startWithCreate(() =>
 			lib.combinator
-				.combine(fs, ss, Rx.Observable.never(), Rx.Observable.never())
+				.combine(fs, ss)
 			);
 
 		expect(res.messages).eqls([

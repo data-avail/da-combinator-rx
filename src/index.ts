@@ -14,19 +14,25 @@ export module combinator {
 	export function combine<P, S>(
 		primaryStream: Rx.Observable<P>,
 		secondaryStream: Rx.Observable<S>,
-		primaryStreamClose: Rx.Observable<any>,
-		secondaryStreamClose: Rx.Observable<any>
+		primaryStreamClose?: Rx.Observable<any>,
+		secondaryStreamClose?: Rx.Observable<any>
 		): Rx.Observable<{ primary: P, secondary: S }> {
-						
+										
+		var primaryClose = (primaryStreamClose || Rx.Observable.never())
+			.startWith(null)
+			.map(m => {return {type : ItemType.close, item : null}});
+		
+		var secondaryClose = Rx.Observable.never().startWith(tulpe(ItemType.close, null));
+								
 		//(type, x/f)
 		var primes = primaryStream
 			.map(m => tulpe(ItemType.first, m))
-			.merge(primaryStreamClose.startWith(null).map(m => tulpe(ItemType.close, m)));
-							  	
+			.merge(primaryClose);
+												  	
 		//(type, x/s)
 		var seconds = secondaryStream
 			.map(m => tulpe(ItemType.second, m))
-			.merge(secondaryStreamClose.startWith(null).map(m => tulpe(ItemType.close, m)));
+			.merge(secondaryClose);
 										
 		//[[(type, x/f),(type, x/s)]
 		var combines = primes.combineLatest(seconds, (v1, v2) => [v1, v2]);
@@ -40,14 +46,18 @@ export module combinator {
 		//primes.subscribe(val => console.log("iii", val));			
 		//combines.subscribe(val => console.log("---", val));			
 		//seconds.subscribe(val => console.log("+++", seconds));
-		//closings.subscribe(val => console.log("***"));
+		//closings.subscribe(val => console.log("***", val));
 		
 		//[(f1, s:latest), (f2, s:latest)]
 		var windows = combines.buffer(closings)
 		//grab latest from secondary and pair it with all primary
 		.map(v => v.map(m => [m[0], v[v.length - 1][1]])) 
 		.selectMany(v => Rx.Observable.fromArray(v))
-		.distinctUntilChanged(v => v[0].item);		
+		//.filter(f => f[0].type != ItemType.close)
+		.distinctUntilChanged(v => v[0].item);
+		
+		
+		//windows.subscribe(val => console.log("***", val));
 		
 		var results = windows.filter(v => v[0].type != ItemType.close && v[1].type != ItemType.close);
 			

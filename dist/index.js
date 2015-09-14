@@ -11,12 +11,16 @@ var combinator;
     ;
     function tulpe(type, item) { return { type: type, item: item }; }
     function combine(primaryStream, secondaryStream, primaryStreamClose, secondaryStreamClose) {
+        var primaryClose = (primaryStreamClose || Rx.Observable.never())
+            .startWith(null)
+            .map(function (m) { return { type: ItemType.close, item: null }; });
+        var secondaryClose = Rx.Observable.never().startWith(tulpe(ItemType.close, null));
         var primes = primaryStream
             .map(function (m) { return tulpe(ItemType.first, m); })
-            .merge(primaryStreamClose.startWith(null).map(function (m) { return tulpe(ItemType.close, m); }));
+            .merge(primaryClose);
         var seconds = secondaryStream
             .map(function (m) { return tulpe(ItemType.second, m); })
-            .merge(secondaryStreamClose.startWith(null).map(function (m) { return tulpe(ItemType.close, m); }));
+            .merge(secondaryClose);
         var combines = primes.combineLatest(seconds, function (v1, v2) { return [v1, v2]; });
         var closings = combines.filter(function (v) {
             return (v[0].type == ItemType.first && v[1].type == ItemType.second) ||

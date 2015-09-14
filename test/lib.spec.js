@@ -16,7 +16,7 @@ describe("tests for combine | no cancel", function () {
         var ss = scheduler.createHotObservable(onNext(600, "s1"), onCompleted(700));
         var res = scheduler.startWithCreate(function () {
             return lib.combinator
-                .combine(fs, ss, Rx.Observable.never(), Rx.Observable.never());
+                .combine(fs, ss);
         });
         expect(res.messages).eqls([onNext(600, { primary: "f1", secondary: "s1" })]);
     });
@@ -31,7 +31,7 @@ describe("tests for combine | no cancel", function () {
         var ss = scheduler.createHotObservable(onNext(500, "s1"), onCompleted(700));
         var res = scheduler.startWithCreate(function () {
             return lib.combinator
-                .combine(fs, ss, Rx.Observable.never(), Rx.Observable.never());
+                .combine(fs, ss);
         });
         expect(res.messages).eqls([
             onNext(500, { primary: "f1", secondary: "s1" }),
@@ -49,7 +49,7 @@ describe("tests for combine | no cancel", function () {
         var ss = scheduler.createHotObservable(onNext(300, "s1"), onCompleted(700));
         var res = scheduler.startWithCreate(function () {
             return lib.combinator
-                .combine(fs, ss, Rx.Observable.never(), Rx.Observable.never());
+                .combine(fs, ss);
         });
         expect(res.messages).eqls([
             onNext(500, { primary: "f1", secondary: "s1" })
@@ -66,7 +66,7 @@ describe("tests for combine | no cancel", function () {
         var ss = scheduler.createHotObservable(onNext(300, "s1"), onNext(400, "s2"), onCompleted(700));
         var res = scheduler.startWithCreate(function () {
             return lib.combinator
-                .combine(fs, ss, Rx.Observable.never(), Rx.Observable.never());
+                .combine(fs, ss);
         });
         expect(res.messages).eqls([
             onNext(500, { primary: "f1", secondary: "s2" })
@@ -83,7 +83,7 @@ describe("tests for combine | no cancel", function () {
         var ss = scheduler.createHotObservable(onNext(300, "s1"), onNext(600, "s2"), onCompleted(700));
         var res = scheduler.startWithCreate(function () {
             return lib.combinator
-                .combine(fs, ss, Rx.Observable.never(), Rx.Observable.never());
+                .combine(fs, ss);
         });
         expect(res.messages).eqls([
             onNext(500, { primary: "p1", secondary: "s1" })
@@ -100,7 +100,7 @@ describe("tests for combine | no cancel", function () {
         var ss = scheduler.createHotObservable(onNext(300, "s1"), onNext(400, "s2"), onNext(700, "s3"), onNext(900, "s4"), onCompleted(1700));
         var res = scheduler.startWithCreate(function () {
             return lib.combinator
-                .combine(fs, ss, Rx.Observable.never(), Rx.Observable.never());
+                .combine(fs, ss);
         });
         expect(res.messages).eqls([
             onNext(500, { primary: "p1", secondary: "s2" }),
