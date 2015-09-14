@@ -52,14 +52,13 @@ describe("tests for combine | cancel primary", () => {
 
 	})
 
-	it("p-x-s, should not issue any result", () => {
+	it("p-x-s, should issue p+x result", () => {
 							
 		//[p1]--[x1]---------
 		//------------[s1]---
 		//===================
-		//-------------------
-		//-------------------
-
+		//------[p1]----------
+		//------[x1]---------
 		
 		var scheduler = new Rx.TestScheduler();
 
@@ -84,13 +83,15 @@ describe("tests for combine | cancel primary", () => {
 				.combine(ps, ss, xp)
 			);
 
+		//console.log(res.messages.map(val => val.value));
+					
 		expect(res.messages).eqls(
-			[]
+			[onNext(400, { primary: "p1", secondary: "x1" })]
 			);
 
 	})
 
-	it("p-s-x-s, should issue 2 results", () => {
+	it("p-s-x-p, should issue 2 results", () => {
 							
 		//[p1]--------[x1]--[p2]---
 		//------[s1]---------------
@@ -123,7 +124,8 @@ describe("tests for combine | cancel primary", () => {
 				.combine(ps, ss, xp)
 			);
 						
-
+		//console.log(res.messages.map(val => val.value));
+					
 		expect(res.messages).eqls(
 				[
 					onNext(400, { primary: "p1", secondary: "s1" }),

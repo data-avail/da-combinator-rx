@@ -30,7 +30,7 @@ var combinator;
             .map(function (v) { return v.map(function (m) { return [m[0], v[v.length - 1][1]]; }); })
             .selectMany(function (v) { return Rx.Observable.fromArray(v); })
             .distinctUntilChanged(function (v) { return v[0].item; });
-        var results = windows.filter(function (v) { return v[0].type != ItemType.close && v[1].type != ItemType.close; });
+        var results = windows.filter(function (v) { return v[0].type != ItemType.close && !(v[0].type == ItemType.close && v[1].type == ItemType.close); });
         return results.map(function (val) {
             return { primary: val[0].item, secondary: val[1].item };
         });

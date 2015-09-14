@@ -53,13 +53,12 @@ export module combinator {
 		//grab latest from secondary and pair it with all primary
 		.map(v => v.map(m => [m[0], v[v.length - 1][1]])) 
 		.selectMany(v => Rx.Observable.fromArray(v))
-		//.filter(f => f[0].type != ItemType.close)
 		.distinctUntilChanged(v => v[0].item);
 		
 		
 		//windows.subscribe(val => console.log("***", val));
 		
-		var results = windows.filter(v => v[0].type != ItemType.close && v[1].type != ItemType.close);
+		var results = windows.filter(v => v[0].type != ItemType.close && !(v[0].type == ItemType.close && v[1].type == ItemType.close));
 			
 		return results.map(val => {
 			return { primary: val[0].item, secondary: val[1].item }

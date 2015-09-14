@@ -21,12 +21,12 @@ describe("tests for combine | cancel primary", function () {
         });
         expect(res.messages).eqls([onNext(600, { primary: "p1", secondary: "s1" })]);
     });
-    it("p-x-s, should not issue any result", function () {
+    it("p-x-s, should issue p+x result", function () {
         //[p1]--[x1]---------
         //------------[s1]---
         //===================
-        //-------------------
-        //-------------------
+        //------[p1]----------
+        //------[x1]---------
         var scheduler = new Rx.TestScheduler();
         var ps = scheduler.createHotObservable(onNext(300, "p1"), onCompleted(1000));
         var ss = scheduler.createHotObservable(onNext(600, "s1"), onCompleted(1000));
@@ -35,9 +35,9 @@ describe("tests for combine | cancel primary", function () {
             return lib.combinator
                 .combine(ps, ss, xp);
         });
-        expect(res.messages).eqls([]);
+        expect(res.messages).eqls([onNext(400, { primary: "p1", secondary: "x1" })]);
     });
-    it("p-s-x-s, should issue 2 results", function () {
+    it("p-s-x-p, should issue 2 results", function () {
         //[p1]--------[x1]--[p2]---
         //------[s1]---------------
         //=========================
