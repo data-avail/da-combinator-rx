@@ -14,7 +14,9 @@ var combinator;
         var primaryClose = (primaryStreamClose || Rx.Observable.never())
             .startWith(null)
             .map(function (m) { return { type: ItemType.close, item: m }; });
-        var secondaryClose = Rx.Observable.never().startWith(tulpe(ItemType.close, null));
+        var secondaryClose = (secondaryStreamClose || Rx.Observable.never())
+            .startWith(null)
+            .map(function (m) { return { type: ItemType.close, item: m }; });
         var primes = primaryStream
             .map(function (m) { return tulpe(ItemType.first, m); })
             .merge(primaryClose);

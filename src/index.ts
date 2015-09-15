@@ -22,7 +22,9 @@ export module combinator {
 			.startWith(null)
 			.map(m => {return {type : ItemType.close, item : m}});
 		
-		var secondaryClose = Rx.Observable.never().startWith(tulpe(ItemType.close, null));
+		var secondaryClose = (secondaryStreamClose || Rx.Observable.never())
+			.startWith(null)
+			.map(m => {return {type : ItemType.close, item : m}});
 								
 		//(type, x/f)
 		var primes = primaryStream
