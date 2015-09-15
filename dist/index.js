@@ -13,7 +13,7 @@ var combinator;
     function combine(primaryStream, secondaryStream, primaryStreamClose, secondaryStreamClose) {
         var primaryClose = (primaryStreamClose || Rx.Observable.never())
             .startWith(null)
-            .map(function (m) { return { type: ItemType.close, item: null }; });
+            .map(function (m) { return { type: ItemType.close, item: m }; });
         var secondaryClose = Rx.Observable.never().startWith(tulpe(ItemType.close, null));
         var primes = primaryStream
             .map(function (m) { return tulpe(ItemType.first, m); })
@@ -27,7 +27,13 @@ var combinator;
                 (v[0].type == ItemType.close && v[1].type == ItemType.close);
         });
         var windows = combines.buffer(closings)
-            .map(function (v) { return v.map(function (m) { return [m[0], v[v.length - 1][1]]; }); })
+            .withLatestFrom(closings, function (v, c) {
+            var latest_p = v[v.length - 1][0];
+            var latest_s = v[v.length - 1][1];
+            return v.map(function (m) {
+                return [m[0], latest_p.type != ItemType.close ? latest_s : latest_p];
+            });
+        })
             .selectMany(function (v) { return Rx.Observable.fromArray(v); })
             .distinctUntilChanged(function (v) { return v[0].item; });
         var results = windows.filter(function (v) { return v[0].type != ItemType.close && !(v[0].type == ItemType.close && v[1].type == ItemType.close); });

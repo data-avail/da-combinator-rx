@@ -20,7 +20,7 @@ export module combinator {
 										
 		var primaryClose = (primaryStreamClose || Rx.Observable.never())
 			.startWith(null)
-			.map(m => {return {type : ItemType.close, item : null}});
+			.map(m => {return {type : ItemType.close, item : m}});
 		
 		var secondaryClose = Rx.Observable.never().startWith(tulpe(ItemType.close, null));
 								
@@ -44,14 +44,22 @@ export module combinator {
 			(v[0].type == ItemType.close && v[1].type == ItemType.close));		
 		
 		//primes.subscribe(val => console.log("iii", val));			
-		//combines.subscribe(val => console.log("---", val));			
+		//combines.subscribe(val => console.log("$$$$", val));			
 		//seconds.subscribe(val => console.log("+++", seconds));
-		//closings.subscribe(val => console.log("***", val));
+		//closings.subscribe(val => console.log("---", val));
 		
 		//[(f1, s:latest), (f2, s:latest)]
 		var windows = combines.buffer(closings)
 		//grab latest from secondary and pair it with all primary
-		.map(v => v.map(m => [m[0], v[v.length - 1][1]])) 
+		.withLatestFrom(closings, (v, c) => { 
+
+			var latest_p = v[v.length - 1][0];  
+			var latest_s = v[v.length - 1][1];
+			
+			return v.map(m => { 
+				return [ m[0], latest_p.type != ItemType.close ? latest_s : latest_p ]; 
+			})
+		}) 
 		.selectMany(v => Rx.Observable.fromArray(v))
 		.distinctUntilChanged(v => v[0].item);
 		
