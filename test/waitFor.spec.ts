@@ -37,7 +37,7 @@ describe("combintor test", () => {
 
 
 		var res = scheduler.startWithCreate(() =>
-			combinator.combine(ps, (p) => xs)
+			combinator.waitFor(ps, (p) => xs)
 		);
 
 		expect(res.messages).eqls(
@@ -90,7 +90,7 @@ describe("combintor test", () => {
 		 */
 
 		var res = scheduler.startWithCreate(() =>
-			combinator.combine(ps, (p) => xs)
+			combinator.waitFor(ps, (p) => xs)
 		);
 		
 
@@ -128,7 +128,7 @@ describe("combintor test", () => {
 		xs.subscribe(_=>_);			
 
 		var res = scheduler.startWithCreate(() => 
-			combinator.combine(ps, (p) => xs)
+			combinator.waitFor(ps, (p) => xs)
 		);
 		
 		
@@ -168,7 +168,7 @@ describe("combintor test", () => {
 		xs.subscribe(_=>_);
 		
 		var res = scheduler.startWithCreate(() => 
-			combinator.combine(ps, (p) => xs)
+			combinator.waitFor(ps, (p) => xs)
 		);
 		
 

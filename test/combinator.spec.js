@@ -15,7 +15,7 @@ describe("combintor test", function () {
         var ps = scheduler.createHotObservable(onNext(300, "p1"), onCompleted(700));
         var xs = scheduler.createHotObservable(onNext(600, "x1"), onCompleted(700));
         var res = scheduler.startWithCreate(function () {
-            return combinator.combine(ps, function (p) { return xs; });
+            return combinator.waitFor(ps, function (p) { return xs; });
         });
         expect(res.messages).eqls([
             onNext(600, { p: "p1", r: "x1" }),
@@ -32,7 +32,7 @@ describe("combintor test", function () {
         var ps = scheduler.createHotObservable(onNext(400, "p1"), onCompleted(800));
         var xs = scheduler.createColdObservable(onNext(100, "x1"), onCompleted(800)).shareReplay(null, 1);
         var res = scheduler.startWithCreate(function () {
-            return combinator.combine(ps, function (p) { return xs; });
+            return combinator.waitFor(ps, function (p) { return xs; });
         });
         expect(res.messages).eqls([
             onNext(500, { p: "p1", r: "x1" }),
@@ -50,7 +50,7 @@ describe("combintor test", function () {
         var xs = scheduler.createColdObservable(onNext(100, "x1"), onCompleted(800)).shareReplay(1, null, scheduler);
         xs.subscribe(function (_) { return _; });
         var res = scheduler.startWithCreate(function () {
-            return combinator.combine(ps, function (p) { return xs; });
+            return combinator.waitFor(ps, function (p) { return xs; });
         });
         expect(res.messages).eqls([
             onNext(401, { p: "p1", r: "x1" }),
@@ -68,7 +68,7 @@ describe("combintor test", function () {
         var xs = scheduler.createColdObservable(onNext(100, "x1"), onNext(200, "x2"), onCompleted(800)).shareReplay(1, null, scheduler);
         xs.subscribe(function (_) { return _; });
         var res = scheduler.startWithCreate(function () {
-            return combinator.combine(ps, function (p) { return xs; });
+            return combinator.waitFor(ps, function (p) { return xs; });
         });
         expect(res.messages).eqls([
             onNext(401, { p: "p1", r: "x2" }),
