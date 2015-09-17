@@ -43,7 +43,7 @@ describe("combintor test", () => {
 		expect(res.messages).eqls(
 			[
 				onNext(600, { p: "p1", r: "x1" }),
-				onCompleted(700)
+				onCompleted(600)
 			]
 			);
 	})
@@ -97,7 +97,7 @@ describe("combintor test", () => {
 		expect(res.messages).eqls(
 			[
 				onNext(500, { p: "p1", r: "x1" }),
-				onCompleted(800)
+				onCompleted(500)
 			]
 			);
 	})
@@ -115,7 +115,7 @@ describe("combintor test", () => {
 
 		var ps = scheduler.createHotObservable(
 			onNext(400, "p1"),
-			onCompleted(800)
+			onCompleted(401)
 			);
 
 
@@ -124,7 +124,7 @@ describe("combintor test", () => {
 			onCompleted(800)
 			).shareReplay(1, null, scheduler);
 		
-		//subscribe immediately in order to start replay at one 						
+		//subscribe immediately in order to start replay at once 						
 		xs.subscribe(_=>_);			
 
 		var res = scheduler.startWithCreate(() => 
@@ -135,7 +135,7 @@ describe("combintor test", () => {
 		expect(res.messages).eqls(
 			[
 				onNext(401, { p: "p1", r: "x1" }),
-				onCompleted(800)
+				onCompleted(401)
 			]
 			);
 	})
@@ -164,7 +164,7 @@ describe("combintor test", () => {
 			onCompleted(800)
 			).shareReplay(1, null, scheduler);
 		
-		//subscribe immediately in order to start replay at one 						
+		//subscribe immediately in order to start replay at once 						
 		xs.subscribe(_=>_);
 		
 		var res = scheduler.startWithCreate(() => 
@@ -175,7 +175,7 @@ describe("combintor test", () => {
 		expect(res.messages).eqls(
 			[
 				onNext(401, { p: "p1", r: "x2" }),
-				onCompleted(800)
+				onCompleted(401)
 			]
 			);
 	})

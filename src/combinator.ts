@@ -5,8 +5,8 @@ export function combine<P, R>(stream: Rx.Observable<P>, close: (p: P) => Rx.Obse
 	return stream.selectMany(p => {
 		//zip - will wait till, withLatestFrom - not
 		var ps = close(p); 
-		return Rx.Observable.just(p).zip(ps, (x, y) => {return {p : x, r : y}}).take(1);
-	});	
+		return Rx.Observable.just(p).zip(ps, (x, y) => {return {p : x, r : y}});
+	}).take(1);	
 }
 
 

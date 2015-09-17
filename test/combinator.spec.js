@@ -19,7 +19,7 @@ describe("combintor test", function () {
         });
         expect(res.messages).eqls([
             onNext(600, { p: "p1", r: "x1" }),
-            onCompleted(700)
+            onCompleted(600)
         ]);
     });
     it("simplest case, x(replyed)-p, should issue result after p arrival + interval of x", function () {
@@ -36,7 +36,7 @@ describe("combintor test", function () {
         });
         expect(res.messages).eqls([
             onNext(500, { p: "p1", r: "x1" }),
-            onCompleted(800)
+            onCompleted(500)
         ]);
     });
     it("x-p, should issue result after p arrival", function () {
@@ -46,7 +46,7 @@ describe("combintor test", function () {
         //-----------[p1]-----
         //-----------[x1]----
         var scheduler = new Rx.TestScheduler();
-        var ps = scheduler.createHotObservable(onNext(400, "p1"), onCompleted(800));
+        var ps = scheduler.createHotObservable(onNext(400, "p1"), onCompleted(401));
         var xs = scheduler.createColdObservable(onNext(100, "x1"), onCompleted(800)).shareReplay(1, null, scheduler);
         xs.subscribe(function (_) { return _; });
         var res = scheduler.startWithCreate(function () {
@@ -54,7 +54,7 @@ describe("combintor test", function () {
         });
         expect(res.messages).eqls([
             onNext(401, { p: "p1", r: "x1" }),
-            onCompleted(800)
+            onCompleted(401)
         ]);
     });
     it("x1-x2-p, should issue p1+x2 after p arrival", function () {
@@ -72,7 +72,7 @@ describe("combintor test", function () {
         });
         expect(res.messages).eqls([
             onNext(401, { p: "p1", r: "x2" }),
-            onCompleted(800)
+            onCompleted(401)
         ]);
     });
 });
