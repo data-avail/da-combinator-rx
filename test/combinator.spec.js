@@ -5,74 +5,109 @@ var Rx = require('rx/index');
 var expect = chai.expect;
 var onNext = Rx.ReactiveTest.onNext, onCompleted = Rx.ReactiveTest.onCompleted, subscribe = Rx.ReactiveTest.subscribe;
 describe("combintor test", function () {
-    it("simplest case, p-x, should issue result immediately after x arrival", function () {
+    it("p-s => p+s after s arrival", function () {
         //[p1]--------
-        //------[x1]--
+        //------[s1]--
         //============
         //------[p1]--
-        //------[x1]--
+        //------[s1]--
         var scheduler = new Rx.TestScheduler();
         var ps = scheduler.createHotObservable(onNext(300, "p1"), onCompleted(700));
-        var xs = scheduler.createHotObservable(onNext(600, "x1"), onCompleted(700));
+        var ss = scheduler.createHotObservable(onNext(600, "s1"), onCompleted(700));
         var res = scheduler.startWithCreate(function () {
-            return combinator.waitFor(ps, function (p) { return xs; });
+            return combinator.combine(ps, ss);
         });
         expect(res.messages).eqls([
-            onNext(600, { p: "p1", r: "x1" }),
-            onCompleted(600)
+            onNext(600, { p: "p1", r: "s1" }),
+            onCompleted(700)
         ]);
     });
-    it("simplest case, x(replyed)-p, should issue result after p arrival + interval of x", function () {
-        //-----------[p1]------------
-        //---[x1]--------------------
-        //=========================
-        //------------------[p1]-----
-        //------------------[x1]----
+    it("p1-p2-s => p1+s1, p2+s1 after s arrival", function () {
+        //[p1]-[p2]------------
+        //-----------[s1]------
+        //======================
+        //-----------[p1]-[p2]--
+        //-----------[s1]-[s1]--
         var scheduler = new Rx.TestScheduler();
-        var ps = scheduler.createHotObservable(onNext(400, "p1"), onCompleted(800));
-        var xs = scheduler.createColdObservable(onNext(100, "x1"), onCompleted(800)).shareReplay(null, 1);
+        var ps = scheduler.createHotObservable(onNext(300, "p1"), onNext(400, "p2"), onCompleted(700));
+        var ss = scheduler.createHotObservable(onNext(600, "s1"), onCompleted(700));
         var res = scheduler.startWithCreate(function () {
-            return combinator.waitFor(ps, function (p) { return xs; });
+            return combinator.combine(ps, ss);
         });
         expect(res.messages).eqls([
-            onNext(500, { p: "p1", r: "x1" }),
-            onCompleted(500)
+            onNext(600, { p: "p1", r: "s1" }),
+            onNext(600, { p: "p2", r: "s1" }),
+            onCompleted(700)
         ]);
     });
-    it("x-p, should issue result after p arrival", function () {
-        //-----------[p1]------------
-        //---[x1]--------------------
-        //=========================
-        //-----------[p1]-----
-        //-----------[x1]----
+    it("s-p => p+s after p arrival", function () {
+        //------[p1]--
+        //-[s1]-------
+        //============
+        //------[p1]--
+        //------[s1]--
         var scheduler = new Rx.TestScheduler();
-        var ps = scheduler.createHotObservable(onNext(400, "p1"), onCompleted(401));
-        var xs = scheduler.createColdObservable(onNext(100, "x1"), onCompleted(800)).shareReplay(1, null, scheduler);
-        xs.subscribe(function (_) { return _; });
+        var ps = scheduler.createHotObservable(onNext(500, "p1"), onCompleted(700));
+        var ss = scheduler.createHotObservable(onNext(300, "s1"), onCompleted(700));
         var res = scheduler.startWithCreate(function () {
-            return combinator.waitFor(ps, function (p) { return xs; });
+            return combinator.combine(ps, ss);
         });
         expect(res.messages).eqls([
-            onNext(401, { p: "p1", r: "x1" }),
-            onCompleted(401)
+            onNext(500, { p: "p1", r: "s1" }),
+            onCompleted(700)
         ]);
     });
-    it("x1-x2-p, should issue p1+x2 after p arrival", function () {
-        //------------[p1]------------
-        //--[x1]-[x2]-------------------
-        //=========================
-        //------------[p1]-----
-        //------------[x2]----
+    it("s1-s2-p1 => p1+s2 after p arrival", function () {
+        //------------[p1]---
+        //-[s1]-[s2]---------
+        //==================
+        //------------[p1]--
+        //------------[s2]--
         var scheduler = new Rx.TestScheduler();
-        var ps = scheduler.createHotObservable(onNext(400, "p1"), onCompleted(800));
-        var xs = scheduler.createColdObservable(onNext(100, "x1"), onNext(200, "x2"), onCompleted(800)).shareReplay(1, null, scheduler);
-        xs.subscribe(function (_) { return _; });
+        var ps = scheduler.createHotObservable(onNext(500, "p1"), onCompleted(700));
+        var ss = scheduler.createHotObservable(onNext(300, "s1"), onNext(400, "s2"), onCompleted(700));
         var res = scheduler.startWithCreate(function () {
-            return combinator.waitFor(ps, function (p) { return xs; });
+            return combinator.combine(ps, ss);
         });
         expect(res.messages).eqls([
-            onNext(401, { p: "p1", r: "x2" }),
-            onCompleted(401)
+            onNext(500, { p: "p1", r: "s2" }),
+            onCompleted(700)
+        ]);
+    });
+    it("p1-s-p2 => p1+s-p2+s", function () {
+        //--[p1]------[p2]--
+        //-------[s1]-------
+        //==================
+        //-------[p1]-[p2]--
+        //-------[s1]-[s1]--
+        var scheduler = new Rx.TestScheduler();
+        var ps = scheduler.createHotObservable(onNext(300, "p1"), onNext(500, "p2"), onCompleted(700));
+        var ss = scheduler.createHotObservable(onNext(400, "s1"), onCompleted(700));
+        var res = scheduler.startWithCreate(function () {
+            return combinator.combine(ps, ss, null, scheduler);
+        });
+        expect(res.messages).eqls([
+            onNext(401, { p: "p1", r: "s1" }),
+            onNext(501, { p: "p2", r: "s1" }),
+            onCompleted(700)
+        ]);
+    });
+    it("p1-s1-p2-s2 => p1+s1-p2+s1", function () {
+        //--[p1]------[p2]------
+        //-------[s1]-------[s2]
+        //======================
+        //-------[p1]-[p2]------
+        //-------[s1]-[s1]-------
+        var scheduler = new Rx.TestScheduler();
+        var ps = scheduler.createHotObservable(onNext(300, "p1"), onNext(500, "p2"), onCompleted(700));
+        var ss = scheduler.createHotObservable(onNext(400, "s1"), onNext(600, "s2"), onCompleted(700));
+        var res = scheduler.startWithCreate(function () {
+            return combinator.combine(ps, ss, null, scheduler);
+        });
+        expect(res.messages).eqls([
+            onNext(401, { p: "p1", r: "s1" }),
+            onNext(501, { p: "p2", r: "s1" }),
+            onCompleted(700)
         ]);
     });
 });

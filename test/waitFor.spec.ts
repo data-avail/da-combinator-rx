@@ -43,7 +43,7 @@ describe("combintor test", () => {
 		expect(res.messages).eqls(
 			[
 				onNext(600, { p: "p1", r: "x1" }),
-				onCompleted(600)
+				onCompleted(700)
 			]
 			);
 	})
@@ -97,7 +97,7 @@ describe("combintor test", () => {
 		expect(res.messages).eqls(
 			[
 				onNext(500, { p: "p1", r: "x1" }),
-				onCompleted(500)
+				onCompleted(800)
 			]
 			);
 	})
@@ -115,7 +115,7 @@ describe("combintor test", () => {
 
 		var ps = scheduler.createHotObservable(
 			onNext(400, "p1"),
-			onCompleted(401)
+			onCompleted(800)
 			);
 
 
@@ -135,7 +135,7 @@ describe("combintor test", () => {
 		expect(res.messages).eqls(
 			[
 				onNext(401, { p: "p1", r: "x1" }),
-				onCompleted(401)
+				onCompleted(800)
 			]
 			);
 	})
@@ -175,7 +175,7 @@ describe("combintor test", () => {
 		expect(res.messages).eqls(
 			[
 				onNext(401, { p: "p1", r: "x2" }),
-				onCompleted(401)
+				onCompleted(800)
 			]
 			);
 	})
