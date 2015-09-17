@@ -84,7 +84,7 @@ describe("combintor test", function () {
         var ps = scheduler.createHotObservable(onNext(300, "p1"), onNext(500, "p2"), onCompleted(700));
         var ss = scheduler.createHotObservable(onNext(400, "s1"), onCompleted(700));
         var res = scheduler.startWithCreate(function () {
-            return combinator.combine(ps, ss, null, scheduler);
+            return combinator.combine(ps, ss, scheduler);
         });
         expect(res.messages).eqls([
             onNext(401, { p: "p1", r: "s1" }),
@@ -102,7 +102,7 @@ describe("combintor test", function () {
         var ps = scheduler.createHotObservable(onNext(300, "p1"), onNext(500, "p2"), onCompleted(700));
         var ss = scheduler.createHotObservable(onNext(400, "s1"), onNext(600, "s2"), onCompleted(700));
         var res = scheduler.startWithCreate(function () {
-            return combinator.combine(ps, ss, null, scheduler);
+            return combinator.combine(ps, ss, scheduler);
         });
         expect(res.messages).eqls([
             onNext(401, { p: "p1", r: "s1" }),

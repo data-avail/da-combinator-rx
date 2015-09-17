@@ -183,7 +183,7 @@ describe("combintor test", () => {
 
 
 		var res = scheduler.startWithCreate(() =>
-			combinator.combine(ps, ss, null, scheduler)
+			combinator.combine(ps, ss, scheduler)
 		);
 
 		expect(res.messages).eqls(
@@ -221,7 +221,7 @@ describe("combintor test", () => {
 
 
 		var res = scheduler.startWithCreate(() =>
-			combinator.combine(ps, ss, null, scheduler)
+			combinator.combine(ps, ss, scheduler)
 		);
 
 		expect(res.messages).eqls(
