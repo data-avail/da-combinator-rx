@@ -11,7 +11,6 @@
     "outDir": "./dist"
   },
   "files" : [  
-    "src/index.ts",
     "src/combinator.ts"
   ]
 }
