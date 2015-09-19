@@ -26,14 +26,12 @@ function combineGroup(primary, secondary, keySelector, scheduler) {
     var secAcc = secondary.scan(function (acc, val) {
         acc[keySelector(item(StreamType.secondary, val))] = val;
         return acc;
-    }, {});
-    var merged = primary.map(function (p) { return item(StreamType.primary, p); })
-        .merge(secondary.map(function (s) { return item(StreamType.secondary, s); }));
-    var grouped = merged.groupBy(keySelector)
-        .selectMany(function (v) {
-        var ps = v.filter(function (p) { return p.type == StreamType.primary; }).map(function (p) { return p.item; });
-        var ss = v.filter(function (p) { return p.type == StreamType.secondary; }).map(function (p) { return p.item; });
-        return combine(ps, ss, scheduler);
+    }, {}).shareReplay(1, null, scheduler);
+    secAcc.subscribe(function (_) { return _; });
+    return primary.groupBy(function (p) { return keySelector(item(StreamType.secondary, p)); })
+        .selectMany(function (gp) {
+        var gs = secAcc.map(function (s) { return s[gp.key]; }).filter(function (f) { return !!f; });
+        return combine(gp, gs, scheduler, false);
     });
 }
 exports.combineGroup = combineGroup;

@@ -1,7 +1,7 @@
 ///<reference path="../typings/tsd.d.ts"/>
 import * as Rx from "rx";
 
-export function waitFor<P, R>(stream: Rx.Observable<P>, close: (p: P) => Rx.Observable<R>): Rx.Observable<{p: P, r: R}> {										
+export function waitFor<P, S>(stream: Rx.Observable<P>, close: (p: P) => Rx.Observable<S>): Rx.Observable<{p: P, r: S}> {										
 	
 	return stream.selectMany(p => {
 		//zip - will wait till, withLatestFrom - not
@@ -12,7 +12,7 @@ export function waitFor<P, R>(stream: Rx.Observable<P>, close: (p: P) => Rx.Obse
 			
 }
 
-export function combine<P, S, R>(primary: Rx.Observable<P>, secondary: Rx.Observable<S>, scheduler?: Rx.IScheduler, secondaryUseReplay: boolean = true): Rx.Observable<{p: P, r: R|S}> {										
+export function combine<P, S, R>(primary: Rx.Observable<P>, secondary: Rx.Observable<S>, scheduler?: Rx.IScheduler, secondaryUseReplay: boolean = true): Rx.Observable<{p: P, r: S}> {										
  		
 		if (secondaryUseReplay) {
 			secondary = secondary.shareReplay(1, null, scheduler);
@@ -33,7 +33,7 @@ export interface IStreamItem {
 }
 function item(type: StreamType, item: any) : IStreamItem {return {type: type, item : item}} 
 
-export function combineGroup<P, S, R>(primary: Rx.Observable<P>, secondary: Rx.Observable<S>, keySelector: (item: IStreamItem) => string, scheduler?: Rx.IScheduler): Rx.Observable<{p: P, r: R|S}> {										
+export function combineGroup<P, S, R>(primary: Rx.Observable<P>, secondary: Rx.Observable<S>, keySelector: (item: IStreamItem) => string, scheduler?: Rx.IScheduler): Rx.Observable<{p: P, r: S}> {										
 		
 		
 		var secAcc = secondary.scan((acc: any, val: S) => {
@@ -42,15 +42,20 @@ export function combineGroup<P, S, R>(primary: Rx.Observable<P>, secondary: Rx.O
 		}, {}).shareReplay(1, null, scheduler);
 		
 		secAcc.subscribe(_=>_);
-				
+			
+        /*									
 		var merged = primary.map(p => item(StreamType.primary, p))
 		.merge(secAcc.map(s => item(StreamType.secondary, s)));
-		
-		return merged.groupBy(keySelector)
-		.selectMany(v => {  
+		*/
+				
+		return primary.groupBy(p => keySelector(item(StreamType.secondary, p)))
+		.selectMany(gp => {
+			var gs = secAcc.map(s => s[gp.key]).filter(f => !!f);
+			/*  
 			var ps = v.filter(p => p.type == StreamType.primary).map(p => p.item);
-			var ss = v.filter(p => p.type == StreamType.secondary).map(p => p.item[v.key]);
-			return combine(ps, ss, scheduler, false);
+			var ss = v.filter(s => s.type == StreamType.secondary).map(s => s.item[v.key]);
+			*/
+			return combine(gp, gs, scheduler, false);
 		});				
 }
 
