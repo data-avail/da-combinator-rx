@@ -4,7 +4,7 @@ var combinator = require('../src/combinator');
 var Rx = require('rx/index');
 var expect = chai.expect;
 var onNext = Rx.ReactiveTest.onNext, onCompleted = Rx.ReactiveTest.onCompleted, subscribe = Rx.ReactiveTest.subscribe;
-describe.only("combintor grouped test", function () {
+describe("combintor grouped test", function () {
     it("p-s => p+s after s arrival", function () {
         //[pa1]--------
         //------[sa1]--

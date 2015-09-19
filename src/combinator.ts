@@ -61,7 +61,6 @@ export function combineGroup<P, S>(primary: Rx.Observable<P>, secondary: Rx.Obse
 		.flatMap(gp => {
 			var gs = secAcc.map(s => s[gp.key]).filter(f => !!f);
 			
-			
 			/*  
 			var ps = v.filter(p => p.type == StreamType.primary).map(p => p.item);
 			var ss = v.filter(s => s.type == StreamType.secondary).map(s => s.item[v.key]);

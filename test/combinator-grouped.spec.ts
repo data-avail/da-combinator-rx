@@ -11,7 +11,7 @@ var onNext = Rx.ReactiveTest.onNext,
     subscribe = Rx.ReactiveTest.subscribe;
 
 
-describe.only("combintor grouped test", () => {
+describe("combintor grouped test", () => {
 
 	it("p-s => p+s after s arrival", () => {
 							
@@ -231,8 +231,6 @@ describe.only("combintor grouped test", () => {
 				onCompleted(700)
 			]
 			);
-	})
-
-	
+	})	
 }) 
 
