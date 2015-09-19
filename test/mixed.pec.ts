@@ -13,7 +13,7 @@ var onNext = Rx.ReactiveTest.onNext,
 
 describe("mix test", () => {
 	
-	it.only("mixed", () => {
+	it("mixed", () => {
 							
 		//[pa1]---[pb1]--------------
 		//--[sb1]--------------[sa1]-
@@ -28,9 +28,8 @@ describe("mix test", () => {
 		var scheduler = new Rx.TestScheduler();
 
 		var ps = scheduler.createHotObservable(
-			onNext(300, {k : "a", v : "pa1"}),
+			onNext(100, {k : "a", v : "pa1"}),
 			onNext(400, {k : "b", v : "pb1"}),
-			//onNext(400, {k : "a", v : "pa2"}),
 			onCompleted(1500)
 			);
 
@@ -42,16 +41,15 @@ describe("mix test", () => {
 			);
 
 
-		var res = scheduler.startWithDispose(() =>
+		var res = scheduler.startWithTiming(() =>
 			combinator.combineGroup(ps, ss, (i) => i.item.k, scheduler)
-		, 2000);
+		,0 , 0, 2000);
 	
 
 		expect(res.messages).eqls(
 			[
 				onNext(401, { p: {k : "b", v : "pb1"}, s: {k : "b", v : "sb1"} }),
 				onNext(421, { p: {k : "a", v : "pa1"}, s: {k : "a", v : "sa1"} }),
-				//onNext(421, { p: {k : "a", v : "pa2"}, s: {k : "a", v : "sa1"} }),
 				onCompleted(1500)
 			]
 			);
@@ -62,11 +60,11 @@ describe("mix test", () => {
 
 	it("mixed groups", () => {
 							
-		//[oa1]---[ob1]-[oa2]-----------------------[oa3]---[ob3]-
-		//--[qb1]--------[qa1]---[qa2]--[qb2]-[qb3]---------------
+		//[pa1]---[pb1]-[pa2]-----------------------[pa3]---[pb2]-
+		//--[sb1]--------[sa1]---[sa2]--[sb2]-[sb3]---------------
 		//========================================================
-		//---------[ob1]-[oa1][oa2]-----------------[oa3]---[ob3]
-		//---------[qb1]-[qa1][qa1]-----------------[qa2]---[qb3]
+		//---------[pb1]-[pa1][pa2]-----------------[pa3]---[pb2]
+		//---------[sb1]-[sa1][sa1]-----------------[sa2]---[sb3]
 
 		
 		var scheduler = new Rx.TestScheduler();
@@ -74,10 +72,10 @@ describe("mix test", () => {
 		var ps = scheduler.createHotObservable(
 			onNext(100, {k : "a", v : "pa1"}),
 			onNext(300, {k : "b", v : "pb1"}),
-			//onNext(400, {k : "a", v : "pa2"}),
-			//onNext(1100, {k : "b", v : "pb2"}),
-			//onNext(1200, {k : "b", v : "pb3"}),
-			onCompleted(1000)
+			onNext(400, {k : "a", v : "pa2"}),
+			onNext(1100, {k : "a", v : "pa3"}),
+			onNext(1200, {k : "b", v : "pb2"}),
+			onCompleted(1900)
 			);
 
 
@@ -87,24 +85,22 @@ describe("mix test", () => {
 			onNext(500, {k : "a", v : "sa2"}),
 			onNext(600, {k : "b", v : "sb2"}),
 			onNext(700, {k : "b", v : "sb3"}),
-			onCompleted(1000)
+			onCompleted(1900)
 			);
 
 
-		var res = scheduler.startWithCreate(() =>
+		var res = scheduler.startWithTiming(() =>
 			combinator.combineGroup(ps, ss, (i) => i.item.k, scheduler)
-		);
+		,0,0,2000);
 		
-		console.log(res.messages);
-
 		expect(res.messages).eqls(
 			[
 				onNext(301, { p: {k : "b", v : "pb1"}, s: {k : "b", v : "sb1"} }),
 				onNext(406, { p: {k : "a", v : "pa1"}, s: {k : "a", v : "sa1"} }),
-				//onNext(406, { p: {k : "a", v : "pa2"}, s: {k : "a", v : "sa1"} }),
-				//onNext(1001, { p: {k : "a", v : "pa3"}, s: {k : "a", v : "sa2"} }),
-				//onNext(1201, { p: {k : "a", v : "pa3"}, s: {k : "a", v : "sb3"} }),
-				onCompleted(1000)
+				onNext(406, { p: {k : "a", v : "pa2"}, s: {k : "a", v : "sa1"} }),
+				onNext(1101, { p: {k : "a", v : "pa3"}, s: {k : "a", v : "sa2"} }),
+				onNext(1201, { p: {k : "b", v : "pb2"}, s: {k : "b", v : "sb3"} }),
+				onCompleted(1900)
 			]
 			);
 			
