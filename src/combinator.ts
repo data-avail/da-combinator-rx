@@ -66,9 +66,9 @@ export function combineGroup<P, S>(primary: Rx.Observable<P>, secondary: Rx.Obse
 			var ss = v.filter(s => s.type == StreamType.secondary).map(s => s.item[v.key]);
 			*/
 			return combine(gp, gs, scheduler, false);
-		});
-				
-		//res.subscribe(_=>console.log("---", _));
+		}).share();
+			
+		//res.subscribe(val => console.log(val));				
 		
 		return res;		
 }

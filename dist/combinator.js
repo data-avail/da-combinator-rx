@@ -34,7 +34,7 @@ function combineGroup(primary, secondary, keySelector, scheduler) {
         .flatMap(function (gp) {
         var gs = secAcc.map(function (s) { return s[gp.key]; }).filter(function (f) { return !!f; });
         return combine(gp, gs, scheduler, false);
-    });
+    }).share();
     return res;
 }
 exports.combineGroup = combineGroup;
