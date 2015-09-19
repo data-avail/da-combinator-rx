@@ -1,18 +1,25 @@
 ///<reference path="../typings/tsd.d.ts"/>
 import * as Rx from "rx";
 
-export function waitFor<P, S>(stream: Rx.Observable<P>, close: (p: P) => Rx.Observable<S>): Rx.Observable<{p: P, r: S}> {										
+export interface ICombinedResult<P, S> {
+	p: P,
+	s: S
+} 
+
+function result<P, S>(p: P, s: S) {return {p: p, s: s} };
+
+export function waitFor<P, S>(stream: Rx.Observable<P>, close: (p: P) => Rx.Observable<S>): Rx.Observable<ICombinedResult<P, S>> {										
 	
 	return stream.selectMany(p => {
 		//zip - will wait till, withLatestFrom - not
 		var ps = close(p); 
 		
-		return Rx.Observable.just(p).zip(ps, (x, y) => {return {p : x, r : y}}).take(1);
+		return Rx.Observable.just(p).zip(ps, result).take(1);
 	});
 			
 }
 
-export function combine<P, S, R>(primary: Rx.Observable<P>, secondary: Rx.Observable<S>, scheduler?: Rx.IScheduler, secondaryUseReplay: boolean = true): Rx.Observable<{p: P, r: S}> {										
+export function combine<P, S, R>(primary: Rx.Observable<P>, secondary: Rx.Observable<S>, scheduler?: Rx.IScheduler, secondaryUseReplay: boolean = true): Rx.Observable<ICombinedResult<P, S>> {										
  		
 		if (secondaryUseReplay) {
 			secondary = secondary.shareReplay(1, null, scheduler);
@@ -33,7 +40,7 @@ export interface IStreamItem {
 }
 function item(type: StreamType, item: any) : IStreamItem {return {type: type, item : item}} 
 
-export function combineGroup<P, S, R>(primary: Rx.Observable<P>, secondary: Rx.Observable<S>, keySelector: (item: IStreamItem) => string, scheduler?: Rx.IScheduler): Rx.Observable<{p: P, r: S}> {										
+export function combineGroup<P, S, R>(primary: Rx.Observable<P>, secondary: Rx.Observable<S>, keySelector: (item: IStreamItem) => string, scheduler?: Rx.IScheduler): Rx.Observable<ICombinedResult<P, S>> {										
 		
 		
 		var secAcc = secondary.scan((acc: any, val: S) => {

@@ -11,9 +11,9 @@ var onNext = Rx.ReactiveTest.onNext,
     subscribe = Rx.ReactiveTest.subscribe;
 
 
-describe.skip("combintor grouped test", () => {
+describe("combintor grouped test", () => {
 
-	it("p-s => p+s after s arrival", () => {
+	it.only("p-s => p+s after s arrival", () => {
 							
 		//[pa1]--------
 		//------[sa1]--
@@ -42,7 +42,7 @@ describe.skip("combintor grouped test", () => {
 
 		expect(res.messages).eqls(
 			[
-				onNext(601, { p: {k : "a", v : "pa1"}, r: {k : "a", v : "sa1"} }),
+				onNext(601, { p: {k : "a", v : "pa1"}, s: {k : "a", v : "sa1"} }),
 				onCompleted(700)
 			]
 			);

@@ -42,7 +42,7 @@ describe("combintor test", () => {
 
 		expect(res.messages).eqls(
 			[
-				onNext(600, { p: "p1", r: "x1" }),
+				onNext(600, { p: "p1", s: "x1" }),
 				onCompleted(700)
 			]
 			);
@@ -96,7 +96,7 @@ describe("combintor test", () => {
 
 		expect(res.messages).eqls(
 			[
-				onNext(500, { p: "p1", r: "x1" }),
+				onNext(500, { p: "p1", s: "x1" }),
 				onCompleted(800)
 			]
 			);
@@ -134,7 +134,7 @@ describe("combintor test", () => {
 		
 		expect(res.messages).eqls(
 			[
-				onNext(401, { p: "p1", r: "x1" }),
+				onNext(401, { p: "p1", s: "x1" }),
 				onCompleted(800)
 			]
 			);
@@ -174,7 +174,7 @@ describe("combintor test", () => {
 
 		expect(res.messages).eqls(
 			[
-				onNext(401, { p: "p1", r: "x2" }),
+				onNext(401, { p: "p1", s: "x2" }),
 				onCompleted(800)
 			]
 			);

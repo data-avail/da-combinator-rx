@@ -18,7 +18,7 @@ describe("combintor test", function () {
             return combinator.combine(ps, ss);
         });
         expect(res.messages).eqls([
-            onNext(600, { p: "p1", r: "s1" }),
+            onNext(600, { p: "p1", s: "s1" }),
             onCompleted(700)
         ]);
     });
@@ -35,8 +35,8 @@ describe("combintor test", function () {
             return combinator.combine(ps, ss);
         });
         expect(res.messages).eqls([
-            onNext(600, { p: "p1", r: "s1" }),
-            onNext(600, { p: "p2", r: "s1" }),
+            onNext(600, { p: "p1", s: "s1" }),
+            onNext(600, { p: "p2", s: "s1" }),
             onCompleted(700)
         ]);
     });
@@ -53,7 +53,7 @@ describe("combintor test", function () {
             return combinator.combine(ps, ss);
         });
         expect(res.messages).eqls([
-            onNext(500, { p: "p1", r: "s1" }),
+            onNext(500, { p: "p1", s: "s1" }),
             onCompleted(700)
         ]);
     });
@@ -70,7 +70,7 @@ describe("combintor test", function () {
             return combinator.combine(ps, ss);
         });
         expect(res.messages).eqls([
-            onNext(500, { p: "p1", r: "s2" }),
+            onNext(500, { p: "p1", s: "s2" }),
             onCompleted(700)
         ]);
     });
@@ -87,8 +87,8 @@ describe("combintor test", function () {
             return combinator.combine(ps, ss, scheduler);
         });
         expect(res.messages).eqls([
-            onNext(401, { p: "p1", r: "s1" }),
-            onNext(501, { p: "p2", r: "s1" }),
+            onNext(401, { p: "p1", s: "s1" }),
+            onNext(501, { p: "p2", s: "s1" }),
             onCompleted(700)
         ]);
     });
@@ -105,8 +105,8 @@ describe("combintor test", function () {
             return combinator.combine(ps, ss, scheduler);
         });
         expect(res.messages).eqls([
-            onNext(401, { p: "p1", r: "s1" }),
-            onNext(501, { p: "p2", r: "s1" }),
+            onNext(401, { p: "p1", s: "s1" }),
+            onNext(501, { p: "p2", s: "s1" }),
             onCompleted(700)
         ]);
     });

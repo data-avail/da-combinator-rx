@@ -4,8 +4,8 @@ var combinator = require('../src/combinator');
 var Rx = require('rx/index');
 var expect = chai.expect;
 var onNext = Rx.ReactiveTest.onNext, onCompleted = Rx.ReactiveTest.onCompleted, subscribe = Rx.ReactiveTest.subscribe;
-describe.skip("combintor grouped test", function () {
-    it("p-s => p+s after s arrival", function () {
+describe("combintor grouped test", function () {
+    it.only("p-s => p+s after s arrival", function () {
         //[pa1]--------
         //------[sa1]--
         //============
@@ -18,7 +18,7 @@ describe.skip("combintor grouped test", function () {
             return combinator.combineGroup(ps, ss, function (i) { return i.item.k; }, scheduler);
         });
         expect(res.messages).eqls([
-            onNext(601, { p: { k: "a", v: "pa1" }, r: { k: "a", v: "sa1" } }),
+            onNext(601, { p: { k: "a", v: "pa1" }, s: { k: "a", v: "sa1" } }),
             onCompleted(700)
         ]);
     });
