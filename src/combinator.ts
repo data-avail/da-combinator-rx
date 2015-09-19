@@ -40,7 +40,7 @@ export interface IStreamItem {
 }
 function item(type: StreamType, item: any) : IStreamItem {return {type: type, item : item}} 
 
-export function combineGroup<P, S, R>(primary: Rx.Observable<P>, secondary: Rx.Observable<S>, keySelector: (item: IStreamItem) => string, scheduler?: Rx.IScheduler): Rx.Observable<ICombinedResult<P, S>> {										
+export function combineGroup<P, S>(primary: Rx.Observable<P>, secondary: Rx.Observable<S>, keySelector: (item: IStreamItem) => string, scheduler?: Rx.IScheduler): Rx.Observable<ICombinedResult<P, S>> {										
 		
 		
 		var secAcc = secondary.scan((acc: any, val: S) => {
@@ -48,21 +48,29 @@ export function combineGroup<P, S, R>(primary: Rx.Observable<P>, secondary: Rx.O
 			 return acc; 
 		}, {}).shareReplay(1, null, scheduler);
 		
-		secAcc.subscribe(_=>_);
+		secAcc.subscribe(_=>_);			
+		
+		//primary.subscribe(_=>console.log("---", _));
 			
         /*									
 		var merged = primary.map(p => item(StreamType.primary, p))
 		.merge(secAcc.map(s => item(StreamType.secondary, s)));
 		*/
-				
-		return primary.groupBy(p => keySelector(item(StreamType.secondary, p)))
-		.selectMany(gp => {
+									
+		var res = primary.groupBy(p => keySelector(item(StreamType.primary, p)))
+		.flatMap(gp => {
 			var gs = secAcc.map(s => s[gp.key]).filter(f => !!f);
+			
+			
 			/*  
 			var ps = v.filter(p => p.type == StreamType.primary).map(p => p.item);
 			var ss = v.filter(s => s.type == StreamType.secondary).map(s => s.item[v.key]);
 			*/
 			return combine(gp, gs, scheduler, false);
-		});				
+		});
+				
+		//res.subscribe(_=>console.log("---", _));
+		
+		return res;		
 }
 

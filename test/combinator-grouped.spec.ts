@@ -11,7 +11,7 @@ var onNext = Rx.ReactiveTest.onNext,
     subscribe = Rx.ReactiveTest.subscribe;
 
 
-describe("combintor grouped test", () => {
+describe.only("combintor grouped test", () => {
 
 	it("p-s => p+s after s arrival", () => {
 							
@@ -73,13 +73,13 @@ describe("combintor grouped test", () => {
 
 
 		var res = scheduler.startWithCreate(() =>
-			combinator.combine(ps, ss)
+			combinator.combineGroup(ps, ss, (i) => i.item.k, scheduler)
 		);
 
 		expect(res.messages).eqls(
 			[
-				onNext(600, { p: {k : "a", v : "pa1"}, s: {k : "a", v : "sa1"} }),
-				onNext(600, { p: {k : "a", v : "pa2"}, s: {k : "a", v : "sa1"} }),
+				onNext(601, { p: {k : "a", v : "pa1"}, s: {k : "a", v : "sa1"} }),
+				onNext(601, { p: {k : "a", v : "pa2"}, s: {k : "a", v : "sa1"} }),
 				onCompleted(700)
 			]
 			);
@@ -110,12 +110,12 @@ describe("combintor grouped test", () => {
 
 
 		var res = scheduler.startWithCreate(() =>
-			combinator.combine(ps, ss)
+			combinator.combineGroup(ps, ss, (i) => i.item.k, scheduler)
 		);
 
 		expect(res.messages).eqls(
 			[
-				onNext(500, { p: {k : "a", v : "pa1"}, s: {k : "a", v : "sa1"} }),
+				onNext(501, { p: {k : "a", v : "pa1"}, s: {k : "a", v : "sa1"} }),
 				onCompleted(700)
 			]
 			);
@@ -146,12 +146,12 @@ describe("combintor grouped test", () => {
 
 
 		var res = scheduler.startWithCreate(() =>
-			combinator.combine(ps, ss)
+			combinator.combineGroup(ps, ss, (i) => i.item.k, scheduler)
 		);
 
 		expect(res.messages).eqls(
 			[
-				onNext(500, { p: {k : "a", v : "pa1"}, s: {k : "a", v : "sa2"} }),
+				onNext(501, { p: {k : "a", v : "pa1"}, s: {k : "a", v : "sa2"} }),
 				onCompleted(700)
 			]
 			);
@@ -183,7 +183,7 @@ describe("combintor grouped test", () => {
 
 
 		var res = scheduler.startWithCreate(() =>
-			combinator.combine(ps, ss, scheduler)
+			combinator.combineGroup(ps, ss, (i) => i.item.k, scheduler)
 		);
 
 		expect(res.messages).eqls(
@@ -221,7 +221,7 @@ describe("combintor grouped test", () => {
 
 
 		var res = scheduler.startWithCreate(() =>
-			combinator.combine(ps, ss, scheduler)
+			combinator.combineGroup(ps, ss, (i) => i.item.k, scheduler)
 		);
 
 		expect(res.messages).eqls(

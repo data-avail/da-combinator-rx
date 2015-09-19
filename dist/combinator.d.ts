@@ -14,4 +14,4 @@ export interface IStreamItem {
     type: StreamType;
     item: any;
 }
-export declare function combineGroup<P, S, R>(primary: Rx.Observable<P>, secondary: Rx.Observable<S>, keySelector: (item: IStreamItem) => string, scheduler?: Rx.IScheduler): Rx.Observable<ICombinedResult<P, S>>;
+export declare function combineGroup<P, S>(primary: Rx.Observable<P>, secondary: Rx.Observable<S>, keySelector: (item: IStreamItem) => string, scheduler?: Rx.IScheduler): Rx.Observable<ICombinedResult<P, S>>;

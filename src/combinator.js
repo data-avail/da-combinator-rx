@@ -30,10 +30,11 @@ function combineGroup(primary, secondary, keySelector, scheduler) {
         return acc;
     }, {}).shareReplay(1, null, scheduler);
     secAcc.subscribe(function (_) { return _; });
-    return primary.groupBy(function (p) { return keySelector(item(StreamType.secondary, p)); })
-        .selectMany(function (gp) {
+    var res = primary.groupBy(function (p) { return keySelector(item(StreamType.primary, p)); })
+        .flatMap(function (gp) {
         var gs = secAcc.map(function (s) { return s[gp.key]; }).filter(function (f) { return !!f; });
         return combine(gp, gs, scheduler, false);
     });
+    return res;
 }
 exports.combineGroup = combineGroup;
