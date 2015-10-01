@@ -1,4 +1,3 @@
-/// <reference path="../typings/tsd.d.ts" />
 import * as Rx from "rx";
 export interface ICombinedResult<P, S> {
     p: P;
