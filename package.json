@@ -1,6 +1,6 @@
 {
   "name": "da-combinator-rx",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "",
   "main": "dist/combinator.js",
   "typings": "dist/combinator.d.ts",
